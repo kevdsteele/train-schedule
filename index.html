@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>HTML with Javascript and Jquery Template </title>
+
+<!-- Bootstrap ref-->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+<!--Jquery-->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="crossorigin="anonymous"></script>
+
+  <!--Firebase-->
+  <script src="https://www.gstatic.com/firebasejs/6.2.3/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.2.3/firebase-database.js"></script>
+
+  <!--Moment-->
+
+  <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+
+
+
+<script type ="text/javascript" src="assets/javascript/script.js"></script>
+<link rel="stylesheet" type ="text/css" href="assets/css/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<!--Train Schedule card and table -->
+
+<div class="card">
+        <div class="card-header">
+          <span>Current Train Schedule: Schedule updates every 60 seconds</span>
+          <span> <input class="btn btn-primary" id="refresh" type="submit" value="Manual Refresh"></span>
+        </div>
+        <div class="card-body">
+                <table class="table table-striped" >
+                        <thead id="train-sked">
+                          <tr>
+                            
+                            <th scope="col">Train Name</th>
+                            <th scope="col">Destination</th>
+                            <th scope="col">Frequency(min)</th>
+                            <th scope="col">Next Arrival</th>
+                            <th scope="col">Min Away</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                       
+                        </tbody>
+                      </table>
+        </div>
+      </div>
+
+
+
+        <div class="card">
+                <div class="card-header">
+                 Add Train
+                </div>
+                <div class="card-body">
+                        <form>
+                                <div class="form-group">
+                                    <label for="inputTrainNAme">Train Name</label>
+                                    <input type="text" class="form-control" id="input-train" placeholder="">
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="inputDestination">Destination</label>
+                                    <input type="text" class="form-control" id="input-destination" placeholder="">
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="inputFirstTime">First Train Time(HH:mm -military time)</label>
+                                    <input type="text" class="form-control" id="input-time" placeholder="">
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="inputFrequency">Frequency(min)</label>
+                                    <input type="text" class="form-control" id="input-frequency" placeholder="">
+                                  </div>
+                                  <input class="btn btn-primary" id="submit" type="submit" value="Submit">
+                            </form>
+                 
+              
+                </div>
+              </div>    
+
+
+</div>
+
+
+
+<!--Bootstrap jquery to be moved to bottom before last body tag-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+
+</html>
