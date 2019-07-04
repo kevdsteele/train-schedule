@@ -1,5 +1,8 @@
 $(document).ready(function () {
 
+ 
+
+
 // Your web app's Firebase configuration
 var firebaseConfig = {
     apiKey: "AIzaSyBtQRiZMCaYMHXQBMsSj4YwFppwBlC-l14",
@@ -14,44 +17,64 @@ var firebaseConfig = {
   firebase.initializeApp(firebaseConfig);
   var database = firebase.database();
 
-setInterval(refresh, 60 * 1000)  
+ refresh();
+  setInterval(refresh, 60 * 1000)  
 
 function refresh( ){
-    database.ref().on("value", function(childSnapshot) {
-        console.log(childSnapshot.val());  
+database.ref().on("value", function(childSnapshot) {
+        
+  childSnapshot.forEach(function(childNodes) {
+    var trainFreq = childNodes.val().frequency;
+    var trainFirst = childNodes.val().first;
+    var trainID=childNodes.key;
+    var updatedArrival = childNodes.val().updatedArrival;
+    var trainFirstConverted = moment(trainFirst, "HH:mm").subtract(1, "years");
+    var currentTime = moment();
+    var diffTime = moment().diff(moment(trainFirstConverted), "minutes");
+    var timeRemainder = diffTime % trainFreq;
+    var minutesToNextTrain = trainFreq - timeRemainder;
+    var nextTrain = moment().add(minutesToNextTrain, "minutes")
 
-        childSnapshot.forEach(function(childNodes) {
-        var trainFreq = childNodes.val().frequency;
-var trainFirst = childNodes.val().first;
-var trainID=childNodes.key;
 
-console.log ("TF is " + trainFreq + "Tfir is " + trainFirst + trainID)
+if (updatedArrival !== "") {
+    var currentTime = moment().format("HH:mm");
+    var start = moment.utc(currentTime, "HH:mm");
+    var end = moment.utc(updatedArrival, "HH:mm");
+    var min = moment.duration(end.diff(start)).asMinutes();
+    
+    // account for being passed the delayed time //
+    if (min < 1) {
 
-var trainFirstConverted = moment(trainFirst, "HH:mm").subtract(1, "years");
+        var updatedTrain = {
+                    
+            updatedArrival:""
+         }
 
-console.log('First train time converted is '+ trainFirstConverted);
+         database.ref().child(trainID).update(updatedTrain);
 
-var currentTime = moment();
+        $("#next"+ trainID).text(moment(nextTrain).format("HH:mm"))
+        $("#next"+ trainID).css("color", "black")
+        $("#m"+ trainID).text(minutesToNextTrain)
+        refresh();
 
-console.log("Current time is " + currentTime);
-console.log("current time formatted is " + moment(currentTime).format("HH:mm"));
+    } else {
+        
+        $("#next"+ trainID).text(updatedArrival + " Delayed")
+        $("#next"+ trainID).css("color", "red")
+        $("#m"+ trainID).text(min)
 
-var diffTime = moment().diff(moment(trainFirstConverted), "minutes");
+       
+       
 
-console.log("Time difference betwen first train and now is " + diffTime);
+    }
+    // calculate the duration
+   
+    
 
-var timeRemainder = diffTime % trainFreq;
-
-console.log("Time remainder is " + timeRemainder)
-
-var minutesToNextTrain = trainFreq - timeRemainder;
-
-var nextTrain = moment().add(minutesToNextTrain, "minutes")
-
-console.log("Minutes to next train is " + minutesToNextTrain + " and next arrival time is " + moment(nextTrain).format("HH:mm"));
-
-$("#next"+ trainID).text(moment(nextTrain).format("HH:mm"))
-$("#m"+ trainID).text(minutesToNextTrain)
+} else {
+    $("#next"+ trainID).text(moment(nextTrain).format("HH:mm"))
+    $("#m"+ trainID).text(minutesToNextTrain)
+}
 
 /*end loop*/
         });
@@ -62,26 +85,21 @@ $("#m"+ trainID).text(minutesToNextTrain)
   };
 
 
-  $(document).on("click", "#refresh", function(event) {
-    event.preventDefault(); 
+$(document).on("click", "#refresh", function(event) {
+event.preventDefault(); 
 
     refresh();
 /* end refresh click*/
 });
 
 
-  $(document).on("click", "#submit", function(event) {
+  $(document).on("click", "#submit-add", function(event) {
     event.preventDefault();
        
-             console.log ("Submit clicked")
-       
-             // Capture user inputs and store them into variables
              var trainName= $("#input-train").val().trim();
              var trainDestination= $("#input-destination").val().trim();
              var trainFrequency= $("#input-frequency").val().trim();
              var trainFirst= $("#input-time").val().trim();
-            
-             
              var newTrain = {
                  name: trainName,
                  destination: trainDestination,
@@ -89,63 +107,34 @@ $("#m"+ trainID).text(minutesToNextTrain)
                  first: trainFirst,
                  updatedArrival: ""
                  };
-
-
-            console.log(newTrain);     
        
          database.ref().push(newTrain);
-             
-          
-       
+
+  $("#add-form").trigger("reset");     
 /*end on click*/       
 });
 
 /* check for new data in database and update table*/
 database.ref().on("child_added", function(childSnapshot) {
-console.log(childSnapshot.val());  
+
 
 var trainName = childSnapshot.val().name;
 var trainDest = childSnapshot.val().destination;
 var trainFreq = childSnapshot.val().frequency;
 var trainFirst = childSnapshot.val().first;
 var trainID=childSnapshot.key;
-
-console.log("Train ID is " + trainID);
-
-console.log(" Train Name " + trainName + "Train Dest " + trainDest + "Train Freq " + trainFreq + "First train " + trainFirst)
-
-
 var trainFirstConverted = moment(trainFirst, "HH:mm").subtract(1, "years");
-
-console.log('First train time converted is '+ trainFirstConverted);
-
 var currentTime = moment();
-
-console.log("Current time is " + currentTime);
-console.log("current time formatted is " + moment(currentTime).format("HH:mm"));
-
 var diffTime = moment().diff(moment(trainFirstConverted), "minutes");
-
-console.log("Time difference betwen first train and now is " + diffTime);
-
 var timeRemainder = diffTime % trainFreq;
-
-console.log("Time remainder is " + timeRemainder)
-
 var minutesToNextTrain = trainFreq - timeRemainder;
-
 var nextTrain = moment().add(minutesToNextTrain, "minutes")
 
-console.log("Minutes to next train is " + minutesToNextTrain + " and next arrival time is " + moment(nextTrain).format("HH:mm"));
-
-
-
-
-
+/* Push to the DOM*/
 
 var newRow = $("<tr>");
 newRow.attr("id", "row"+trainID);
-/*newRow.css("display", "inline-block");*/
+
 
 var nameCell=$("<td>");
 nameCell.attr("id", "n"+ trainID)
@@ -194,7 +183,7 @@ var submitCell =$("<td>");
 submitCell.html('<button type="button" class="btn btn-primary submit" value="' + trainID + '">Submit</button>')
 
 var editTime=$("<td>");
-editTime.html('<input type="text" class="form-control" id="update-time" placeholder=""></input>');
+editTime.html('<input type="text" class="form-control" id="update-time'+ trainID+'" placeholder=""></input>');
 
 $("#train-sked").append(editRow);
 $("#er"+trainID).append(editName,editDest,blank1,editTime,submitCell);
@@ -205,9 +194,33 @@ $("#er"+ childSnapshot.key).remove();
 
       });
 
-      database.ref().on("child_changed", function(childSnapshot) {
-    $("#n"+ childSnapshot.key).text(childSnapshot.val().name);
-    $("#d" + childSnapshot.key).text(childSnapshot.val().destination)
+database.ref().on("child_changed", function(childSnapshot) {
+$("#n"+ childSnapshot.key).text(childSnapshot.val().name);
+$("#d" + childSnapshot.key).text(childSnapshot.val().destination)
+
+
+var currentTime = moment().format("HH:mm");
+var updatedtime=childSnapshot.val().updatedArrival;
+
+var start = moment.utc(currentTime, "HH:mm");
+var end = moment.utc(updatedtime, "HH:mm");
+
+// account for crossing over to midnight the next day
+if (end.isBefore(start)) end.add(1, 'day');
+
+// calculate the duration
+var min = moment.duration(end.diff(start)).asMinutes();
+
+
+
+if (updatedtime !== "") { 
+    
+    $("#next"+ childSnapshot.key).text(updatedtime + " Delayed");
+    $("#next"+ childSnapshot.key).css("color", "red")
+    $("#m"+ childSnapshot.key).text(min);
+  
+}
+
         
               });
 
@@ -218,25 +231,24 @@ $("#er"+ childSnapshot.key).remove();
         var key =$(this).attr("value"); 
       
         database.ref().child(key).remove();
-       
-       
 
-        console.log("#row" + childSnapshot.key);
-       
-        
-        
-        
         });
 
         $(".update").on("click", function(){
             console.log ("Update clicked");
             var key =$(this).attr("value"); 
             $("#er"+key).css("display", "table-row")
+            
+            });
+
+
+
+        $(".submit").on("click", function(){
+            var key =$(this).attr("value");   
             var newtrainName= $("#update-train"+key).val().trim();
             var newtrainDestination= $("#update-dest"+key).val().trim();
-            /*var newtraintime= $("#update-time"+key).val().trim();*/
-
-
+            var newtraintime= $("#update-time"+key).val().trim();
+       
             if (newtrainName !== "") {
                 var updatedTrain = {
                     name: newtrainName,
@@ -254,68 +266,25 @@ $("#er"+ childSnapshot.key).remove();
 
             }
 
-            if (newtrainDestination !== ""){
+            if (newtraintime !== ""){
                 var updatedTrain = {
                     
-                    destination: newtrainDestination
-                }
-                database.ref().child(key).update(updatedTrain);
-
-            }
-
-
-
-            $(".submit").on("click", function(){
-                var key =$(this).attr("value"); 
-                
-            
-                var newtrainName= $("#update-train"+key).val().trim();
-            var newtrainDestination= $("#update-dest"+key).val().trim();
-            /*var newtraintime= $("#update-time"+key).val().trim();*/
-            console.log("New train name is "+ newtrainName);
-
-            if (newtrainName !== "") {
-                var updatedTrain = {
-                    name: newtrainName,
-                
-                }
-                database.ref().child(key).update(updatedTrain);
-            }
-
-            if (newtrainDestination !== ""){
-                var updatedTrain = {
-                    
-                    destination: newtrainDestination
-                }
-                database.ref().child(key).update(updatedTrain);
-
-            }
-
-            if (newtrainDestination !== ""){
-                var updatedTrain = {
-                    
-                    destination: newtrainDestination
+                   updatedArrival:newtraintime
                 }
                 database.ref().child(key).update(updatedTrain);
             }
 
             $("#update-dest"+key).val("")
             $("#update-train"+key).val("")
-
+            $("#update-time"+key).val("")
             $("#er"+key).css("display", "none")
             });
-    console.log("New train name is "+ newtrainName);
-          
-       
-           
-           
-    
-            console.log("#rowid"+ childSnapshot.key);
+ 
            
             
             
             
-            });
+        
 /*end update table data*/
 });
 

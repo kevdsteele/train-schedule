@@ -11,6 +11,8 @@
 <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="crossorigin="anonymous"></script>
 
   <!--Firebase-->
+  <script src="https://cdn.firebase.com/libs/firebaseui/4.0.0/firebaseui.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/4.0.0/firebaseui.css" />
   <script src="https://www.gstatic.com/firebasejs/6.2.3/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/6.2.3/firebase-database.js"></script>
 
@@ -25,13 +27,19 @@
 </head>
 
 <body>
+        <div class="jumbotron jumbotron-fluid text-white bg-dark">
+                <div class="container">
+                  <h1 class="display-4">Metro Maddness</h1>
+  
+                </div>
+              </div>
 
 <div class="container">
 
 <!--Train Schedule card and table -->
 
-<div class="card">
-        <div class="card-header">
+<div class="card mb-4">
+        <div class="card-header bg-success text-white">
           <span>Current Train Schedule: Schedule updates every 60 seconds</span>
           <span> <input class="btn btn-primary" id="refresh" type="submit" value="Manual Refresh"></span>
         </div>
@@ -57,11 +65,11 @@
 
 
         <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-warning text-white">
                  Add Train
                 </div>
                 <div class="card-body">
-                        <form>
+                        <form id="add-form">
                                 <div class="form-group">
                                     <label for="inputTrainNAme">Train Name</label>
                                     <input type="text" class="form-control" id="input-train" placeholder="">
@@ -78,7 +86,7 @@
                                     <label for="inputFrequency">Frequency(min)</label>
                                     <input type="text" class="form-control" id="input-frequency" placeholder="">
                                   </div>
-                                  <input class="btn btn-primary" id="submit" type="submit" value="Submit">
+                                  <input class="btn btn-primary" id="submit-add" type="submit" value="Submit">
                             </form>
                  
               
